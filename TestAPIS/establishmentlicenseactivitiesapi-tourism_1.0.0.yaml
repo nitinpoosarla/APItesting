@@ -1,0 +1,723 @@
+swagger: '2.0'
+info:
+  title: EstablishmentLicenseActivitiesAPI(Tourism)
+  x-ibm-name: establishmentlicenseactivitiesapi-tourism
+  version: 1.0.0
+x-ibm-configuration:
+  cors:
+    enabled: false
+  gateway: datapower-gateway
+  type: rest
+  phase: realized
+  enforced: true
+  testable: true
+  assembly:
+    execute:
+      - activity-log:
+          version: 1.0.0
+          title: activity-log
+          content: payload
+          error-content: payload
+      - gatewayscript:
+          version: 1.0.0
+          title: SettingHeaders
+          source: |-
+            var UserName=apim.getvariable('api.properties.UserName');
+            var password=apim.getvariable('api.properties.Password');
+            var Auth=apim.getvariable('api.properties.Authorization');
+
+
+            apim.setvariable('message.headers.Authorization',Auth);
+            apim.setvariable('message.headers.Password',password);
+            apim.setvariable('message.headers.Content-Type','application/json');
+            apim.setvariable('message.headers.UserName',UserName);
+      - operation-switch:
+          version: 1.0.0
+          title: operation-switch
+          case:
+            - operations:
+                - verb: get
+                  path: /GetEstablishmentLookup
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: GetEstablishmentLookup-invoke
+                    timeout: 60
+                    verb: GET
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(target-url)$(api.operation.path)
+            - operations:
+                - verb: post
+                  path: /SubmitRequest
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: SubmitRequest-invoke
+                    timeout: 60
+                    verb: POST
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error: []
+                    target-url: $(target-url)$(api.operation.path)
+            - operations:
+                - verb: post
+                  path: /ModifySubmitRequest
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: ModifySubmitRequest-invoke
+                    timeout: 60
+                    verb: POST
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error: []
+                    target-url: $(target-url)$(api.operation.path)
+            - operations:
+                - verb: post
+                  path: /GetFees
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: GetFees-invoke
+                    timeout: 60
+                    verb: POST
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error: []
+                    target-url: $(target-url)$(api.operation.path)
+            - operations:
+                - verb: post
+                  path: /UpdateRequst
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: UpdateRequest-invoke
+                    timeout: 60
+                    verb: POST
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error: []
+                    target-url: $(target-url)$(api.operation.path)
+          otherwise: []
+  properties:
+    target-url:
+      value: http://atdd-eserv-dev/_vti_bin/DED/DEDService.svc
+      description: The URL of the target service
+      encoded: false
+    UserName:
+      value: DEDUser
+    Password:
+      value: HnBkoH@2023
+    Authorization:
+      value: BNgH69M0oJTKEHN12
+basePath: /v01
+paths:
+  /GetEstablishmentLookup:
+    get:
+      responses:
+        '200':
+          description: success
+          schema:
+            $ref: '#/definitions/GetEstablishmentLookupResponse'
+  /SubmitRequest:
+    post:
+      responses:
+        '200':
+          description: success
+          schema:
+            $ref: '#/definitions/SubmitRequestResponse'
+      parameters:
+        - name: SubmitRequest-Request
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/SubmitRequest'
+  /ModifySubmitRequest:
+    post:
+      responses:
+        '200':
+          description: success
+          schema:
+            $ref: '#/definitions/ModifySubmitRequestResponse'
+      parameters:
+        - name: ModifySubmitRequest-Request
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/ModifySubmitRequest'
+  /GetFees:
+    post:
+      responses:
+        '200':
+          description: success
+          schema:
+            $ref: '#/definitions/GetFeesResponse'
+      parameters:
+        - name: GetFees-Request
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/GetFeesRequest'
+  /UpdateRequst:
+    post:
+      responses:
+        '200':
+          description: success
+          schema:
+            $ref: '#/definitions/UpdateResponse'
+      parameters:
+        - name: UpdateRequest
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/UpdateRequest'
+schemes:
+  - https
+securityDefinitions:
+  Basic:
+    type: basic
+    x-ibm-authentication-registry: ajman-users
+  X-IBM-Client-Id:
+    type: apiKey
+    name: X-IBM-Client-Id
+    x-key-type: client_id
+    in: header
+  X-IBM-Client-Secret:
+    type: apiKey
+    name: X-IBM-Client-Secret
+    x-key-type: client_secret
+    in: header
+security:
+  - Basic: []
+    X-IBM-Client-Id: []
+    X-IBM-Client-Secret: []
+definitions:
+  SubmitRequest:
+    type: object
+    additionalProperties: false
+    properties:
+      RequestID:
+        type: string
+      RequestType:
+        type: string
+      LicenseNo:
+        type: string
+      ApplicationNo:
+        type: string
+      TradeNameEN:
+        type: string
+      TradeNameAR:
+        type: string
+      Activties:
+        type: array
+        items:
+          - type: integer
+      Notes:
+        type: string
+      CreationDate:
+        type: string
+      IsExempted:
+        type: string
+      ExemptionType:
+        type: string
+      ExemptionNote:
+        type: string
+    required:
+      - RequestID
+      - RequestType
+      - LicenseNo
+      - ApplicationNo
+      - TradeNameEN
+      - TradeNameAR
+      - Activties
+      - Notes
+      - CreationDate
+      - IsExempted
+      - ExemptionType
+      - ExemptionNote
+  ModifySubmitRequest:
+    type: object
+    additionalProperties: false
+    properties:
+      RequestID:
+        type: string
+      RequestType:
+        type: string
+      LicenseNo:
+        type: string
+      ApplicationNo:
+        type: string
+      TradeNameEN:
+        type: string
+      TradeNameAR:
+        type: string
+      Activties:
+        type: array
+        items:
+          - type: integer
+      ModificationType:
+        type: array
+        items:
+          - type: string
+          - type: string
+      Notes:
+        type: string
+      CreationDate:
+        type: string
+      Address:
+        type: string
+      Building:
+        type: string
+      Street:
+        type: string
+      MakaniNumber:
+        type: string
+      HouseX:
+        type: string
+      HouseY:
+        type: string
+      POBoxNo:
+        type: string
+    required:
+      - RequestID
+      - RequestType
+      - LicenseNo
+      - ApplicationNo
+      - TradeNameEN
+      - TradeNameAR
+      - Activties
+      - ModificationType
+      - Notes
+      - CreationDate
+      - Address
+      - Building
+      - Street
+      - MakaniNumber
+      - HouseX
+      - HouseY
+      - POBoxNo
+  UpdateRequest:
+    type: object
+    additionalProperties: false
+    properties:
+      RequestID:
+        type: string
+      RequestType:
+        type: string
+      RequestStatus:
+        type: 'null'
+      LicenseNo:
+        type: string
+      ApplicationNo:
+        type: string
+      TradeNameEN:
+        type: string
+      TradeNameAR:
+        type: string
+      EstablishmentType:
+        type: string
+      Notes:
+        type: string
+      CreationDate:
+        type: string
+      IsExempted:
+        type: string
+      ExemptionType:
+        type: string
+      ExemptionNote:
+        type: string
+      ConfirmationID:
+        type: string
+      PaymentDate:
+        type: string
+      Fees:
+        type: array
+        items:
+          - type: object
+            properties:
+              Amount:
+                type: string
+              FeeID:
+                type: string
+              FeeNameAr:
+                type: string
+              FeeNameEng:
+                type: string
+              MainCode:
+                type: string
+              MemoLineID:
+                type: string
+              SubCode:
+                type: string
+            required:
+              - Amount
+              - FeeID
+              - FeeNameAr
+              - FeeNameEng
+              - MainCode
+              - MemoLineID
+              - SubCode
+    required:
+      - RequestID
+      - RequestType
+      - RequestStatus
+      - LicenseNo
+      - ApplicationNo
+      - TradeNameEN
+      - TradeNameAR
+      - EstablishmentType
+      - Notes
+      - CreationDate
+      - IsExempted
+      - ExemptionType
+      - ExemptionNote
+      - ConfirmationID
+      - PaymentDate
+      - Fees
+  GetFeesRequest:
+    type: object
+    additionalProperties: false
+    properties:
+      LicenseYearlyPeriod:
+        type: string
+      CreationDate:
+        type: string
+      RequestID:
+        type: string
+      LicenseNumber:
+        type: string
+      ApplicationNo:
+        type: string
+      TradeNameAR:
+        type: string
+      TradeNameEN:
+        type: string
+      Rtype:
+        type: string
+      Notes:
+        type: string
+      PartnerNotesServices:
+        type: string
+      ApprovalNoPartnerServices:
+        type: string
+      ExternalApprovalStatusService:
+        type: string
+      ApplicantMobile:
+        type: string
+      ApplicantEmail:
+        type: string
+    required:
+      - LicenseYearlyPeriod
+      - CreationDate
+      - RequestID
+      - LicenseNumber
+      - ApplicationNo
+      - TradeNameAR
+      - TradeNameEN
+      - Rtype
+      - Notes
+      - PartnerNotesServices
+      - ApprovalNoPartnerServices
+      - ExternalApprovalStatusService
+      - ApplicantMobile
+      - ApplicantEmail
+  GetEstablishmentLookupResponse:
+    type: object
+    additionalProperties: false
+    properties:
+      Data:
+        type: object
+        properties:
+          EstablishmentType:
+            type: array
+            items:
+              - type: object
+                properties:
+                  Classification:
+                    type: array
+                    items:
+                      - type: object
+                        properties:
+                          ClassificationArabic:
+                            type: string
+                          ClassificationCode:
+                            type: string
+                          ClassificationEnglish:
+                            type: string
+                          ClassificationID:
+                            type: integer
+                          EstablishmentTypeID:
+                            type: integer
+                        required:
+                          - ClassificationArabic
+                          - ClassificationCode
+                          - ClassificationEnglish
+                          - ClassificationID
+                          - EstablishmentTypeID
+                      - type: object
+                        properties:
+                          ClassificationArabic:
+                            type: string
+                          ClassificationCode:
+                            type: string
+                          ClassificationEnglish:
+                            type: string
+                          ClassificationID:
+                            type: integer
+                          EstablishmentTypeID:
+                            type: integer
+                        required:
+                          - ClassificationArabic
+                          - ClassificationCode
+                          - ClassificationEnglish
+                          - ClassificationID
+                          - EstablishmentTypeID
+                  EstablishmentActivity:
+                    type: array
+                    items:
+                      - type: object
+                        properties:
+                          ActivityTypeArabic:
+                            type: string
+                          ActivityTypeCode:
+                            type: string
+                          ActivityTypeEnglish:
+                            type: string
+                          ActivityTypeID:
+                            type: integer
+                          EstablishmentTypeID:
+                            type: integer
+                        required:
+                          - ActivityTypeArabic
+                          - ActivityTypeCode
+                          - ActivityTypeEnglish
+                          - ActivityTypeID
+                          - EstablishmentTypeID
+                  EstablishmentTypeArabic:
+                    type: string
+                  EstablishmentTypeCode:
+                    type: string
+                  EstablishmentTypeEnglish:
+                    type: string
+                  EstablishmentTypeID:
+                    type: integer
+                required:
+                  - Classification
+                  - EstablishmentActivity
+                  - EstablishmentTypeArabic
+                  - EstablishmentTypeCode
+                  - EstablishmentTypeEnglish
+                  - EstablishmentTypeID
+              - type: object
+                properties:
+                  Classification:
+                    type: array
+                    items: {}
+                  EstablishmentActivity:
+                    type: array
+                    items: {}
+                  EstablishmentTypeArabic:
+                    type: string
+                  EstablishmentTypeCode:
+                    type: string
+                  EstablishmentTypeEnglish:
+                    type: string
+                  EstablishmentTypeID:
+                    type: integer
+                required:
+                  - Classification
+                  - EstablishmentActivity
+                  - EstablishmentTypeArabic
+                  - EstablishmentTypeCode
+                  - EstablishmentTypeEnglish
+                  - EstablishmentTypeID
+              - type: object
+                properties:
+                  Classification:
+                    type: array
+                    items: {}
+                  EstablishmentActivity:
+                    type: array
+                    items: {}
+                  EstablishmentTypeArabic:
+                    type: string
+                  EstablishmentTypeCode:
+                    type: string
+                  EstablishmentTypeEnglish:
+                    type: string
+                  EstablishmentTypeID:
+                    type: integer
+                required:
+                  - Classification
+                  - EstablishmentActivity
+                  - EstablishmentTypeArabic
+                  - EstablishmentTypeCode
+                  - EstablishmentTypeEnglish
+                  - EstablishmentTypeID
+              - type: object
+                properties:
+                  Classification:
+                    type: array
+                    items: {}
+                  EstablishmentActivity:
+                    type: array
+                    items: {}
+                  EstablishmentTypeArabic:
+                    type: string
+                  EstablishmentTypeCode:
+                    type: string
+                  EstablishmentTypeEnglish:
+                    type: string
+                  EstablishmentTypeID:
+                    type: integer
+                required:
+                  - Classification
+                  - EstablishmentActivity
+                  - EstablishmentTypeArabic
+                  - EstablishmentTypeCode
+                  - EstablishmentTypeEnglish
+                  - EstablishmentTypeID
+        required:
+          - EstablishmentType
+      Errors:
+        type: 'null'
+      StatusCode:
+        type: integer
+      StatusDescription:
+        type: string
+    required:
+      - Data
+      - Errors
+      - StatusCode
+      - StatusDescription
+  GetFeesResponse:
+    type: object
+    additionalProperties: false
+    properties:
+      Data:
+        type: object
+        properties:
+          ApplicationNo:
+            type: string
+          CreateDate:
+            type: string
+          Fees:
+            type: array
+            items:
+              - type: object
+                properties:
+                  Amount:
+                    type: string
+                  FeeID:
+                    type: string
+                  FeeNameAr:
+                    type: string
+                  FeeNameEng:
+                    type: string
+                  MainCode:
+                    type: string
+                  MemoLineID:
+                    type: string
+                  SubCode:
+                    type: string
+                required:
+                  - Amount
+                  - FeeID
+                  - FeeNameAr
+                  - FeeNameEng
+                  - MainCode
+                  - MemoLineID
+                  - SubCode
+          LicenseNo:
+            type: string
+          TradeNameAR:
+            type: string
+          TradeNameEN:
+            type: string
+        required:
+          - ApplicationNo
+          - CreateDate
+          - Fees
+          - LicenseNo
+          - TradeNameAR
+          - TradeNameEN
+      Errors:
+        type: 'null'
+      StatusCode:
+        type: integer
+      StatusDescription:
+        type: string
+    required:
+      - Data
+      - Errors
+      - StatusCode
+      - StatusDescription
+  SubmitRequestResponse:
+    type: object
+    additionalProperties: false
+    properties:
+      Data:
+        type: object
+        properties:
+          IsEstablishmentExist:
+            type: boolean
+        required:
+          - IsEstablishmentExist
+      Errors:
+        type: 'null'
+      StatusCode:
+        type: integer
+      StatusDescription:
+        type: string
+    required:
+      - Data
+      - Errors
+      - StatusCode
+      - StatusDescription
+  ModifySubmitRequestResponse:
+    type: object
+    additionalProperties: false
+    properties:
+      Data:
+        type: object
+        properties:
+          IsEstablishmentExist:
+            type: boolean
+        required:
+          - IsEstablishmentExist
+      Errors:
+        type: 'null'
+      StatusCode:
+        type: integer
+      StatusDescription:
+        type: string
+    required:
+      - Data
+      - Errors
+      - StatusCode
+      - StatusDescription
+  UpdateResponse:
+    type: object
+    additionalProperties: false
+    properties:
+      Data:
+        type: object
+        properties:
+          IsUpdated:
+            type: boolean
+        required:
+          - IsUpdated
+      Errors:
+        type: 'null'
+      StatusCode:
+        type: integer
+      StatusDescription:
+        type: string
+    required:
+      - Data
+      - Errors
+      - StatusCode
+      - StatusDescription

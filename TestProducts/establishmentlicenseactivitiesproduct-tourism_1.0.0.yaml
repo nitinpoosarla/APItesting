@@ -1,0 +1,31 @@
+info:
+  title: EstablishmentLicenseActivitiesProduct(Tourism)
+  name: establishmentlicenseactivitiesproduct-tourism
+  version: 1.0.0
+apis:
+  establishmentlicenseactivitiesapi-tourism1.0.0:
+    $ref: establishmentlicenseactivitiesapi-tourism_1.0.0.yaml
+gateways:
+  - datapower-gateway
+plans:
+  default-plan:
+    title: Default Plan
+    description: Default Plan
+    approval: false
+    rate-limits:
+      default:
+        value: 100/1hour
+    apis:
+      establishmentlicenseactivitiesapi-tourism1.0.0: {}
+product: 1.0.0
+visibility:
+  view:
+    enabled: true
+    type: public
+    tags: []
+    orgs: []
+  subscribe:
+    enabled: true
+    type: authenticated
+    tags: []
+    orgs: []
