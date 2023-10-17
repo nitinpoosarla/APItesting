@@ -1,0 +1,1436 @@
+swagger: '2.0'
+info:
+  title: RenewTradeLicense-API(DED)
+  x-ibm-name: renewtradelicense-api-ded
+  version: 1.0.0
+  description: API to create renew trade license
+schemes:
+  - https
+basePath: /v01
+security:
+  - clientID: []
+    clientsecret: []
+securityDefinitions:
+  basicAuth:
+    type: basic
+    x-ibm-authentication-registry: ajman-users
+  clientsecret:
+    type: apiKey
+    name: X-IBM-Client-Secret
+    in: header
+  clientID:
+    type: apiKey
+    in: header
+    name: X-IBM-Client-Id
+x-ibm-configuration:
+  cors:
+    enabled: true
+  gateway: datapower-gateway
+  type: rest
+  phase: realized
+  enforced: true
+  testable: true
+  assembly:
+    execute:
+      - activity-log:
+          version: 1.0.0
+          title: Logging
+          content: payload
+          error-content: payload
+      - gatewayscript:
+          version: 1.0.0
+          title: CallingToken
+          source: >+
+            var tokenurl=apim.getvariable('api.properties.tokenurl');
+
+            var appId=apim.getvariable('api.properties.appId');
+
+
+
+            console.error("tokenurl "+tokenurl);
+
+
+            console.error("appId "+appId);
+
+
+
+            apim.setvariable('tokenurl',tokenurl);
+
+
+            apim.setvariable('appId',appId);
+
+
+
+            apim.setvariable('CancelPermit','/api/LicenseRenew/CancelPermit');
+
+
+            apim.setvariable('GetById','/api/LicenseRenew/GetById');
+
+
+            apim.setvariable('GetLookUpData','/extensions/ExternalEntity/GetLookUpData');
+
+
+      - invoke:
+          version: 1.0.0
+          title: CallingTokenURL
+          timeout: 120
+          verb: GET
+          cache-response: no-cache
+          cache-ttl: 900
+          stop-on-error:
+            - ConnectionError
+          target-url: $(tokenurl)?appId=$(appId)
+          output: tokendata
+      - gatewayscript:
+          version: 1.0.0
+          title: SettingAuthDetails
+          source: >+
+
+            var authval=apim.getvariable('tokendata.body.data.token');
+
+            console.error("authval value"+authval);
+
+
+            console.error("response code from auth call :" +
+            apim.getvariable('message.status.code') );
+
+             apim.setvariable('message.headers.FIAccessKey',authval); 
+            console.error('auth value'+
+            apim.getvariable('message.headers.FIAccessKey'));
+
+
+
+            apim.setvariable('LicenseRenew','/api/LicenseRenew/Search');
+
+
+            apim.setvariable('SetExternalEntityPUN','/ExternalEntity/SetExternalEntityPUN');
+
+
+            apim.setvariable('UploadFile','/Handlers/UploadFile');
+
+
+
+
+      - operation-switch:
+          version: 1.0.0
+          title: operation-switch
+          case:
+            - operations:
+                - verb: get
+                  path: /api/PropertyType
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: PropertypeCall
+                    timeout: 120
+                    verb: GET
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(target-url)$(api.operation.path)?languageId={languageId}
+            - operations:
+                - verb: get
+                  path: /api/Area
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: AreaInvoke
+                    timeout: 120
+                    verb: GET
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(target-url)$(api.operation.path)?languageId={languageId}
+            - operations:
+                - verb: get
+                  path: /api/EstablishmentType
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: EstablishmentInvoke
+                    timeout: 120
+                    verb: GET
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(target-url)$(api.operation.path)?languageId={languageId}
+            - operations:
+                - verb: get
+                  path: /api/Emirate
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: EmirateInvoke
+                    timeout: 120
+                    verb: GET
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(target-url)$(api.operation.path)?languageId={languageId}
+            - operations:
+                - verb: get
+                  path: /api/FeaturedBusinessName
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: FeatureInvoke
+                    timeout: 120
+                    verb: GET
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(target-url)$(api.operation.path)?languageId={languageId}
+            - operations:
+                - verb: get
+                  path: /LicenseApplicationType
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: LicenseApplicationTypeInvoke
+                    timeout: 120
+                    verb: GET
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: >-
+                      $(target-url)$(api.operation.path)?ctrl={ctrl}&languageId={languageId}
+            - operations:
+                - verb: get
+                  path: /api/LegalForm
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: LegalFormInvoke
+                    timeout: 120
+                    verb: GET
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(target-url)$(api.operation.path)?languageId={languageId}
+            - operations:
+                - verb: get
+                  path: /api/Activity
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: ActivityInvoke
+                    timeout: 120
+                    verb: GET
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: >-
+                      $(target-url)$(api.operation.path)?pageIndex={pageIndex}&pageSize={pageSize}&isSole={isSole}&withLocal={withLocal}&searchKey={searchKey}&languageId={languageId}
+            - operations:
+                - verb: get
+                  path: /api/LicenseApplicationType
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: OpertionsInvoke
+                    timeout: 120
+                    verb: GET
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(target-url)$(api.operation.path)?languageId={languageId}
+            - operations:
+                - verb: get
+                  path: /api/FeesList
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: FeesInvoke
+                    timeout: 120
+                    verb: GET
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(target-url)$(api.operation.path)?languageId={languageId}
+            - operations:
+                - verb: get
+                  path: /api/Stakeholder
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: StakeHolderInvoke
+                    timeout: 120
+                    verb: GET
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(target-url)$(api.operation.path)?languageId={languageId}
+            - operations:
+                - verb: get
+                  path: /api/Gender
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: GenderInvoke
+                    timeout: 120
+                    verb: GET
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(target-url)$(api.operation.path)?languageId={languageId}
+            - operations:
+                - verb: get
+                  path: /api/Countries
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: CountriesInvoke
+                    timeout: 120
+                    verb: GET
+                    cache-response: no-cache
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(target-url)$(api.operation.path)?languageId={languageId}
+                - gatewayscript:
+                    version: 1.0.0
+                    title: responseCodeCheck
+                    source: >
+                      console.error("response code from countrie api :" +
+                      apim.getvariable('message.status.code') );
+            - operations:
+                - verb: post
+                  path: /api/OnlineUser/CreateUser
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: CreateUserInvoke
+                    timeout: 120
+                    verb: POST
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(target-url)$(api.operation.path)
+            - operations:
+                - verb: post
+                  path: /api/OnlineUser/ActivateAccount
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: ActivateAccountInvoke
+                    timeout: 120
+                    verb: POST
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(target-url)$(api.operation.path)
+            - operations:
+                - verb: post
+                  path: /api/OnlineUser/LinkToUAEPassByUUID
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: LinkToUAEPASSByUUIDInvoke
+                    timeout: 120
+                    verb: POST
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(target-url)$(api.operation.path)
+            - operations:
+                - verb: post
+                  path: /api/OnlineUser/LinkToUAEPass
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: LinkToUAEPASSInvoke
+                    timeout: 120
+                    verb: POST
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(target-url)$(api.operation.path)
+            - operations:
+                - verb: get
+                  path: /api/OnlineUser/GetByUUID
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: GetByUUIDInvoke
+                    timeout: 120
+                    verb: GET
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: >-
+                      $(target-url)$(api.operation.path)?eid={eid}&uuid={uuid}&email={email}
+            - operations:
+                - verb: post
+                  path: /api/OnlineUser/GenerateToken
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: GenerateUAEPASSTokenInvoke
+                    timeout: 120
+                    verb: POST
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(target-url)$(api.operation.path)
+            - operations:
+                - verb: post
+                  path: /api/CalcLicenceFees/CalcFeesInquiryForRenew
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: CalcFeesInquiryForRenewInvoke
+                    timeout: 120
+                    verb: POST
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(upload-url)$(api.operation.path)?languageId={languageId}
+            - operations:
+                - verb: post
+                  path: /api/CalcLicenceFees/CalcFeesForInquiryService
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: CalcFeesForInquiryServiceInvoke
+                    timeout: 120
+                    verb: POST
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(upload-url)$(api.operation.path)?languageId={languageId}
+            - operations:
+                - verb: post
+                  path: /api/TradeName
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: TradeNameInvoke
+                    timeout: 120
+                    verb: POST
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(target-url)$(api.operation.path)
+            - operations:
+                - verb: get
+                  path: /api/OnlineApplicationStatusInquiry/OnlineApplicationStatus
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: OnlineApplicationStatusInvoke
+                    timeout: 120
+                    verb: GET
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: >-
+                      $(target-url)$(api.operation.path)?requestSerial={requestSerial}&languageId={languageId}
+            - operations:
+                - verb: get
+                  path: /api/License/AvailableLicensesForRenew
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: OnlineApplicationStatusInvoke
+                    timeout: 120
+                    verb: GET
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: >-
+                      $(target-url)$(api.operation.path)?userId={userId}&languageId={languageId}
+            - operations:
+                - verb: get
+                  path: /api/LicenseRenew/Search
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: LicenseRenewSearchInvoke
+                    timeout: 120
+                    verb: GET
+                    cache-response: no-cache
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: >-
+                      $(target-url)$(api.operation.path)?licenseId={licenseId}&languageId={languageId}&userId={userId}
+            - operations:
+                - verb: post
+                  path: /api/LicenseRenew/{value}
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: TradeLicenseRenewInvoke
+                    timeout: 120
+                    verb: POST
+                    cache-response: no-cache
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: >-
+                      https://stgapieservices.ajmanded.ae$(api.operation.path)?languageId={languageId}
+            - operations:
+                - verb: post
+                  path: /api/OnlineUser/ActivationCode
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: ActivationInvoke
+                    timeout: 120
+                    verb: POST
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(target-url)$(api.operation.path)
+            - operations:
+                - verb: post
+                  path: /ExternalEntity/CancelRenewApplication
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: Cancel License Renew Application
+                    timeout: 120
+                    verb: POST
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(cancel-url)$(api.operation.path)
+                    description: Cancel License Renew Application
+            - operations:
+                - verb: get
+                  path: /api/GetById
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: Renew Application
+                    timeout: 120
+                    verb: GET
+                    cache-response: no-cache
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: >-
+                      $(target-url)$(GetById)?loadFullObject={loadFullObject}&loadPayments={loadPayments}&Id={Id}&languageId={languageId}
+                    description: Get Renew Application Data
+            - operations:
+                - verb: post
+                  path: /api/CancelPermit
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: Cancel Annual Permit
+                    timeout: 120
+                    verb: POST
+                    cache-response: no-cache
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(target-url)$(CancelPermit)
+                    description: Cancel Annual Permit
+            - operations:
+                - verb: get
+                  path: /api/RequestExternalApproval/GetExternalApproval
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: GetExternalApproval
+                    timeout: 120
+                    verb: GET
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(target-url)$(api.operation.path)?Id={Id}
+                    description: GetExternalApproval
+            - operations:
+                - verb: post
+                  path: /ExternalEntity/AfterPayment
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: AfterPayment
+                    timeout: 120
+                    verb: POST
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    description: AfterPayment
+                    target-url: $(cancel-url)$(api.operation.path)
+            - operations:
+                - verb: post
+                  path: /ExternalEntity/PreparePayment
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: PreparePayment
+                    timeout: 120
+                    verb: POST
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(cancel-url)$(api.operation.path)
+                    description: PreparePayment
+            - operations:
+                - verb: post
+                  path: /api/RequestExternalApproval/UpdateExternalApproval
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: Update External Approval
+                    timeout: 120
+                    verb: POST
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    description: Update External Approval
+                    target-url: $(target-url)$(api.operation.path)
+            - operations:
+                - verb: get
+                  path: /api/LicenseRenew/SearchByLicenseNumber
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: LicenseRenewByLicenseNumber
+                    timeout: 120
+                    verb: GET
+                    cache-response: no-cache
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: >-
+                      $(target-url)$(LicenseRenew)?licenseNo={licenseNo}&languageId={languageId}
+            - operations:
+                - verb: get
+                  path: /api/ActivitiesRiskLevel
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: ActivityRiskLevel
+                    timeout: 120
+                    verb: GET
+                    cache-response: no-cache
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(target-url)$(api.operation.path)?languageId={languageId}
+            - operations:
+                - verb: post
+                  path: /api/GetLookUpData
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: GetLookUpData
+                    timeout: 120
+                    verb: POST
+                    cache-response: no-cache
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(lookupurl)$(GetLookUpData)
+            - operations:
+                - verb: post
+                  path: /api/ExternalEntity/SetExternalEntityPUN
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: SetExternalEntityPUN
+                    timeout: 120
+                    verb: POST
+                    cache-response: no-cache
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(cancel-url)$(SetExternalEntityPUN)
+            - operations:
+                - verb: post
+                  path: /api/Handlers/UploadFile
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: UploadFile
+                    timeout: 120
+                    verb: POST
+                    cache-response: no-cache
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: >-
+                      http://dediserver-is.cloud-pak-for-integration.svc.cluster.local:7800/fileupload
+            - operations:
+                - verb: get
+                  path: /api/Handlers/Download
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: DownloadFile
+                    timeout: 120
+                    verb: GET
+                    cache-response: no-cache
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: >-
+                      http://dediserver-is.cloud-pak-for-integration.svc.cluster.local:7800/filedownload?$(request.querystring)
+            - operations:
+                - verb: post
+                  path: /api/ActivitiesApprovalsInquiry/GetActivitiesApprovals
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: GetActivitiesApprovals
+                    timeout: 120
+                    verb: POST
+                    cache-response: no-cache
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: $(save-url)$(api.operation.path)
+            - operations:
+                - verb: get
+                  path: /api/TradeLicense/GetList
+              execute:
+                - invoke:
+                    version: 1.0.0
+                    title: TradeLicenseGetList
+                    timeout: 120
+                    verb: GET
+                    cache-response: no-cache
+                    cache-ttl: 900
+                    stop-on-error:
+                      - ConnectionError
+                    target-url: >-
+                      $(save-url)$(api.operation.path)?languageId={languageId}&licenseNumber={licenseNumber}&licenseName={licenseName}
+          otherwise: []
+    catch:
+      - errors:
+          - ConnectionError
+        execute:
+          - throw:
+              version: 1.0.0
+              title: Connection Error
+              name: DED Connection Error
+              message: DED Connection Error  has been occured
+  properties:
+    target-url:
+      value: ' https://192.168.69.112:6060'
+      description: The URL of the target service
+      encoded: false
+    appId:
+      value: 6753rae03ec34c0a911162d4s225ee6d
+    tokenurl:
+      value: ' https://192.168.69.112:6060/api/ApiAccessToken/GenerateMobileAPIAccessToken'
+    base-url:
+      value: http://192.168.111.110:1001/extensions
+    lookupurl:
+      value: http://192.168.111.110:1001
+    cancel-url:
+      value: http://192.168.69.112:3001/extensions
+    save-url:
+      value: https://192.168.69.112:6060
+    upload-url:
+      value: https://stgapieservices.ajmanded.ae
+  application-authentication:
+    certificate: false
+  catalogs:
+    sandbox:
+      properties:
+        target-url: https://stgapieservices.ajmanded.ae
+        appId: 6753rae03ec34c0a911162d4s225ee6d
+        tokenurl: >-
+          https://stgapieservices.ajmanded.ae/api/ApiAccessToken/GenerateMobileAPIAccessToken
+        lookupurl: http://192.168.111.110:1001
+    uat:
+      properties:
+        target-url: ' http://192.168.53.12:6060'
+        appId: 6753rae03ec34c0a911162d4s225ee6d
+        tokenurl: >-
+          https://stgapieservices.ajmanded.ae/api/ApiAccessToken/GenerateMobileAPIAccessToken
+        base-url: http://192.168.111.110:1001/extensions
+        lookupurl: http://192.168.111.110:1001
+        cancel-url: http://192.168.53.12:3001/extensions
+        save-url: http://192.168.53.12:6060
+        upload-url: https://stgapieservices.ajmanded.ae
+paths:
+  /api/GetById:
+    get:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: loadFullObject
+          in: query
+          required: false
+          type: boolean
+        - name: loadPayments
+          in: query
+          required: false
+          type: boolean
+        - name: Id
+          in: query
+          required: false
+          type: string
+        - name: languageId
+          in: query
+          required: false
+          type: integer
+          format: int32
+        - name: userId
+          in: query
+          required: false
+          type: string
+    parameters: []
+  /api/RequestExternalApproval/GetExternalApproval:
+    get:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: Id
+          in: query
+          required: true
+          description: Approver Id GUID
+          type: string
+      consumes: []
+      produces: []
+    parameters: []
+  /api/RequestExternalApproval/UpdateExternalApproval:
+    post:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: req body
+          in: body
+          required: true
+          description: req body
+          schema:
+            type: object
+      consumes: []
+      produces: []
+    parameters: []
+  /api/CancelPermit:
+    post:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: req body
+          in: body
+          required: true
+          description: req body
+          schema:
+            type: object
+    parameters: []
+  /ExternalEntity/CancelRenewApplication:
+    post:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: req body
+          in: body
+          required: true
+          description: req body
+          schema:
+            type: object
+      consumes: []
+      produces: []
+  /ExternalEntity/AfterPayment:
+    post:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: req body
+          in: body
+          required: true
+          description: req body
+          schema:
+            type: object
+      consumes: []
+      produces: []
+  /ExternalEntity/PreparePayment:
+    post:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: req body
+          in: body
+          required: true
+          description: req body
+          schema:
+            type: object
+      consumes: []
+      produces: []
+  /api/OnlineUser/ActivationCode:
+    post:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: request_activationcode
+          in: body
+          required: true
+          description: activationcode
+          schema:
+            type: object
+      consumes: []
+      produces: []
+  /api/LicenseRenew/Search:
+    get:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: licenseId
+          in: query
+          required: false
+          type: string
+          allowEmptyValue: true
+        - name: languageId
+          in: query
+          required: true
+          type: string
+        - name: userId
+          in: query
+          required: false
+          type: string
+          allowEmptyValue: true
+        - name: licenseNo
+          in: query
+          type: string
+          allowEmptyValue: true
+      consumes: []
+      produces: []
+  /api/LicenseRenew/{value}:
+    post:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: languageId
+          in: query
+          required: true
+          type: string
+        - name: value
+          in: path
+          required: true
+          type: string
+        - name: renewTradeLicense-request
+          in: body
+          required: true
+          schema:
+            type: object
+      consumes: []
+      produces: []
+  /api/License/AvailableLicensesForRenew:
+    get:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          type: string
+        - name: languageId
+          in: query
+          required: true
+          type: string
+      consumes: []
+      produces: []
+  /api/OnlineApplicationStatusInquiry/OnlineApplicationStatus:
+    get:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: requestSerial
+          in: query
+          required: true
+          type: string
+        - name: languageId
+          in: query
+          required: true
+          type: string
+      consumes: []
+      produces: []
+  /api/TradeName:
+    post:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: TradeName-Request
+          in: body
+          required: true
+          schema:
+            type: object
+      consumes: []
+      produces: []
+  /api/CalcLicenceFees/CalcFeesForInquiryService:
+    post:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: languageId
+          in: query
+          required: true
+          type: string
+      consumes: []
+      produces: []
+  /api/CalcLicenceFees/CalcFeesInquiryForRenew:
+    post:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: languageId
+          in: query
+          required: true
+          type: string
+      consumes: []
+      produces: []
+  /api/OnlineUser/GenerateToken:
+    post:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: GenerateToken
+          in: body
+          required: true
+          schema:
+            type: object
+      consumes: []
+      produces: []
+  /api/OnlineUser/GetByUUID:
+    get:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: eid
+          in: query
+          required: true
+          type: string
+        - name: uuid
+          in: query
+          required: true
+          type: string
+        - name: email
+          in: query
+          required: true
+          type: string
+      consumes: []
+      produces: []
+  /api/OnlineUser/LinkToUAEPass:
+    post:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: LinkToUAEPass
+          in: body
+          required: true
+          schema:
+            type: object
+      consumes: []
+      produces: []
+  /api/OnlineUser/LinkToUAEPassByUUID:
+    post:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: LinkToUAEPassByUUID
+          in: body
+          required: true
+          schema:
+            type: object
+      consumes: []
+      produces: []
+  /api/OnlineUser/ActivateAccount:
+    post:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: ActivateAccount
+          in: body
+          required: true
+          schema:
+            type: object
+      consumes: []
+      produces: []
+  /api/OnlineUser/CreateUser:
+    post:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: CreateUser
+          in: body
+          required: true
+          schema:
+            type: object
+      consumes: []
+      produces: []
+  /api/FeesList:
+    get:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: languageId
+          in: query
+          required: true
+          type: string
+      consumes: []
+      produces: []
+  /api/PropertyType:
+    get:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: languageId
+          in: query
+          required: true
+          type: string
+    parameters: []
+  /api/Area:
+    get:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: languageId
+          in: query
+          required: true
+          type: string
+      consumes: []
+      produces: []
+    parameters: []
+  /api/EstablishmentType:
+    get:
+      responses:
+        '200':
+          schema:
+            type: string
+          description: success
+    parameters: []
+  /api/Emirate:
+    get:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: languageId
+          in: query
+          required: true
+          type: string
+      consumes: []
+      produces: []
+    parameters: []
+  /api/FeaturedBusinessName:
+    get:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: languageId
+          in: query
+          required: true
+          type: string
+      consumes: []
+      produces: []
+    parameters: []
+  /api/LicenseApplicationType:
+    get:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: languageId
+          in: query
+          required: true
+          type: string
+      consumes: []
+      produces: []
+  /api/LegalForm:
+    get:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: languageId
+          in: query
+          required: true
+          type: string
+      consumes: []
+      produces: []
+    parameters: []
+  /api/Activity:
+    get:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: pageIndex
+          in: query
+          required: true
+          type: string
+        - name: pageSize
+          in: query
+          required: true
+          type: string
+        - name: isSole
+          in: query
+          required: true
+          type: string
+        - name: withLocal
+          in: query
+          required: true
+          type: string
+        - name: searchKey
+          in: query
+          required: true
+          type: string
+        - name: languageId
+          in: query
+          required: true
+          type: string
+      consumes: []
+      produces: []
+    parameters: []
+  /api/Stakeholder:
+    get:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: languageId
+          in: query
+          required: true
+          type: string
+      consumes: []
+      produces: []
+  /api/Gender:
+    get:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: languageId
+          in: query
+          required: true
+          description: languageId 1- EN,2 -AR
+          type: string
+      consumes: []
+      produces: []
+  /api/Countries:
+    get:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: languageId
+          in: query
+          required: true
+          description: lang id 1- EN ,2 - AR
+          type: string
+    parameters: []
+  /api/LicenseRenew/SearchByLicenseNumber:
+    get:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: licenseNo
+          required: true
+          in: query
+          type: string
+        - name: languageId
+          required: true
+          in: query
+          type: string
+  /api/ActivitiesRiskLevel:
+    get:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: languageId
+          in: query
+          type: string
+  /api/GetLookUpData:
+    parameters: []
+    post:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: RequestBody-Lookups
+          in: body
+          required: true
+          schema:
+            type: object
+  /api/ExternalEntity/SetExternalEntityPUN:
+    post:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: SetExternalEntityPUN-Request
+          in: body
+          schema:
+            type: object
+  /api/Handlers/UploadFile:
+    post:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters: []
+  /api/Handlers/Download:
+    get:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+  /api/ActivitiesApprovalsInquiry/GetActivitiesApprovals:
+    post:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: GetActivitiesApprovals-Request
+          required: true
+          in: body
+          schema: {}
+  /api/TradeLicense/GetList:
+    get:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      parameters:
+        - name: licenseNumber
+          required: false
+          in: query
+          type: string
+          allowEmptyValue: true
+        - name: languageId
+          required: true
+          in: query
+          type: string
+        - name: licenseName
+          in: query
+          type: string
+          allowEmptyValue: true
